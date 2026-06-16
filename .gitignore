@@ -1,0 +1,14 @@
+# สภาพแวดล้อมจำลอง (Virtual Environments)
+venv/
+env/
+
+# ไฟล์ Cache ของ Python
+__pycache__/
+*.pyc
+*.pyo
+
+# ไฟล์ระบบปฏิบัติการ
+.DS_Store
+Thumbs.db
+
+pygame==2.5.2

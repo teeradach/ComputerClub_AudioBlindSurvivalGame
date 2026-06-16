@@ -1,0 +1,11 @@
+# --- Core Game Libraries (ไลบรารีหลักที่ต้องใช้) ---
+pygame>=2.5.2
+keyboard>=0.13.5
+
+# --- Accessibility & Text-to-Speech (ไลบรารีเผื่อไว้สำหรับทำเสียงพูดสังเคราะห์) ---
+pyttsx3>=2.90
+accessible-output2>=0.14
+
+# --- Audio Manipulation (ไลบรารีเผื่อไว้สำหรับจัดการไฟล์เสียงขั้นสูง) ---
+pydub>=0.25.1
+mutagen>=1.47.0
