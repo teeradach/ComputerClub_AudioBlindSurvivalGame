@@ -1,33 +1,28 @@
 import time
-import keyboard  # ไลบรารีสำหรับจับการกดคีย์บอร์ดแบบเรียลไทม์
-import pygame    # ไลบรารีสำหรับระบบเสียง
-import math      # ไลบรารีสำหรับคำนวณคณิตศาสตร์ (ใช้หาระยะห่างเพื่อทำเสียง 3 มิติ)
+import keyboard
+import pygame
+import math
 
 # ==========================================
 # ส่วนที่ 1: ตั้งค่าระบบเสียง (Audio Setup)
 # ==========================================
 pygame.mixer.init()
-
-# จองช่องสัญญาณเสียง (Channel) แยกต่างหาก เพื่อไม่ให้เสียงประตูโดนเสียงเดินขัดจังหวะ
 door_channel = pygame.mixer.Channel(1)
 
-# สร้างคลาสกันชน (Dummy) เผื่อกรณีเด็กๆ ลืมใส่ไฟล์เสียง เกมจะได้ไม่พังและไปต่อได้
 class DummySound:
     def play(self, loops=0): pass
     def set_volume(self, vol): pass
 
-# โหลดเสียงเอฟเฟกต์ (ใส่ไว้ในตัวแปรเพื่อเรียกใช้ง่ายๆ)
 try:
     walk_sound = pygame.mixer.Sound("../sounds/Step/hero_walk_step.wav")
     bump_sound = pygame.mixer.Sound("../sounds/SFX/wall_bump.wav")
-    door_sound = pygame.mixer.Sound("../sounds/SFX/door_audio_cue.wav") # <--- เพิ่มเสียงประตู
+    door_sound = pygame.mixer.Sound("../sounds/SFX/door_audio_cue.wav")
 except:
     print("คำเตือน: หาไฟล์เสียงบางไฟล์ไม่พบ!")
     walk_sound = DummySound()
     bump_sound = DummySound()
     door_sound = DummySound()
 
-# ฟังก์ชันเล่นเสียงบรรยากาศ
 def play_ambience():
     try:
         pygame.mixer.music.load("../sounds/Ambience/birds_ambience.ogg")
@@ -44,18 +39,18 @@ hero_y = 1
 map_width = 10
 map_height = 10
 
-# กำหนดตำแหน่งของประตู
+# กำหนดตำแหน่งของประตู (เป้าหมาย)
 door_x = 10
 door_y = 6
 
-# จำลองข้อมูลศัตรู
 enemies = [
     {"name": "มังกรเวิ่นเว้อ", "x": 5, "y": 5}
 ]
 
 print("--- ยินดีต้อนรับสู่เกมส์เอาชีวิตรอด ---")
 print("คำแนะนำ:")
-print("- กดลูกศร ขึ้น ลง ซ้าย ขวา เพื่อเดิน (กดค้างได้)")
+print("- กดลูกศร ขึ้น ลง ซ้าย ขวา เพื่อเดิน")
+print("- กด Spacebar เพื่อกระทำ (Action) เช่น เปิดประตู หรือเก็บของ")
 print("- กด m เพื่อฟังตำแหน่งของคุณ")
 print("- กด e เพื่อฟังตำแหน่งศัตรู")
 print("- กด esc เพื่อออกจากเกม")
@@ -64,31 +59,19 @@ print("- กด esc เพื่อออกจากเกม")
 # ลอจิกคำนวณความดังของเสียงตามระยะทาง (Spatial Audio)
 # ==========================================
 def update_positional_audio():
-    # 1. หาระยะห่าง (Distance) ระหว่างฮีโร่กับประตู ด้วยสูตรคณิตศาสตร์
     distance = math.hypot(hero_x - door_x, hero_y - door_y)
-    
-    # 2. หาระยะห่างที่ไกลที่สุดของแผนที่ 10x10 (ประมาณ 14.14 หน่วย)
     max_distance = math.hypot(map_width, map_height)
-    
-    # 3. คำนวณความดัง: ยิ่งระยะห่างน้อย ความดังยิ่งเข้าใกล้ 1.0 (100%)
     volume = 1.0 - (distance / max_distance)
-    
-    # กันเหนียว: ป้องกันไม่ให้ค่าเสียงติดลบ
     if volume < 0:
         volume = 0.0
-        
-    # สั่งให้ช่องเสียงของประตูเปลี่ยนความดังตามที่คำนวณได้
     door_channel.set_volume(volume)
 
-# เริ่มเปิดเสียงนกร้องบรรยากาศ
 play_ambience()
-
-# เริ่มเล่นเสียงประตูวนลูปไปเรื่อยๆ (loops=-1) พร้อมตั้งค่าความดังตามตำแหน่งเริ่มต้น
 door_channel.play(door_sound, loops=-1)
 update_positional_audio()
 
 # ==========================================
-# ส่วนที่ 3: ระบบการเดิน (Game Loop)
+# ส่วนที่ 3: ระบบการเดินและการกดปุ่ม (Game Loop)
 # ==========================================
 escaped = False
 move_delay = 0.3 
@@ -98,7 +81,7 @@ while not escaped:
     moved = False
     hit_wall = False
 
-    # ตรวจสอบการกดปุ่ม
+    # ตรวจสอบการกดปุ่มทิศทาง
     if keyboard.is_pressed('up'):
         if hero_y > 1:        
             hero_y -= 1       
@@ -127,6 +110,22 @@ while not escaped:
         else:
             hit_wall = True     
 
+    # ------------------------------------------
+    # ปุ่ม Action (Spacebar) สำหรับโต้ตอบกับสิ่งรอบตัว
+    # ------------------------------------------
+    elif keyboard.is_pressed('space'):
+        # เช็คว่าตอนที่กด Spacebar ฮีโร่ยืนอยู่ตรงกับสิ่งของอะไรบ้าง
+        if hero_x == door_x and hero_y == door_y:
+            print("เปิดประตูสำเร็จ! คุณเดินออกจากห้องได้แล้ว")
+            pygame.mixer.music.stop() 
+            door_channel.stop()
+            escaped = True
+            time.sleep(1) 
+        else:
+            # ถ้ากดยกเลิกในที่ว่างเปล่า (ไม่มีอะไรให้ทำ)
+            print("ความว่างเปล่า") 
+            time.sleep(0.5)
+
     # คีย์ลัด M: เช็คพิกัดตัวเอง
     elif keyboard.is_pressed('m'):
         print(f"ตำแหน่งของคุณตอนนี้คือ X: {hero_x}, Y: {hero_y}")
@@ -147,29 +146,18 @@ while not escaped:
         break
 
     # ==========================================
-    # ลอจิกการเล่นเสียงเมื่อเกิดเหตุการณ์
+    # ลอจิกการเล่นเสียงและการแจ้งเตือนเมื่อเดิน
     # ==========================================
     if moved:
         walk_sound.play() 
-        # <--- อัปเดตความดังของเสียงประตูทุกครั้งที่ก้าวเดิน
         update_positional_audio() 
+        
+        # ถ้าย้ายตำแหน่งมาทับกับพิกัดสิ่งของ ให้พิมพ์บอกเพื่อให้ NVDA อ่านทันที
+        if hero_x == door_x and hero_y == door_y:
+            print("ประตู") 
+            
         time.sleep(move_delay) 
         
     elif hit_wall:
         bump_sound.play() 
-        time.sleep(move_delay) 
-
-    # ==========================================
-    # เงื่อนไขการเจอสิ่งของหรือประตู
-    # ==========================================
-    # เช็คว่าผู้เล่นเดินมาทับตำแหน่งเดียวกับประตูหรือไม่
-    if hero_x == door_x and hero_y == door_y:
-        print("ประตู") # แจ้งเตือนเมื่อเดินมาถึงจุดที่เป็นประตู
-        print("คุณเดินออกจากประตูสำเร็จแล้ว!")
-        
-        # หยุดเสียงทั้งหมดเมื่อหนีสำเร็จ
-        pygame.mixer.music.stop() 
-        door_channel.stop()
-        
-        escaped = True
-        time.sleep(1)
+        time.sleep(move_delay)
