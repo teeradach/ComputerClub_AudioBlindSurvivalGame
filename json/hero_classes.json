@@ -1,0 +1,58 @@
+{
+  "classes": {
+    "swordsman": {
+      "name": "นักดาบ",
+      "base_hp": 150,
+      "base_attack": 25,
+      "base_defense": 10,
+      "skills": [
+        {
+          "id": "s1",
+          "name": "การร่ายรำดาบ",
+          "target": "single",
+          "hits": 3,
+          "damage_bonus": 1.2,
+          "effect": "none",
+          "description": "โจมตีเป้าหมายเดี่ยว 3 ครั้ง"
+        },
+        {
+          "id": "s2",
+          "name": "ดาบล่องลอยตกจากฟ้า",
+          "target": "multi",
+          "hits": 1,
+          "damage_bonus": 1.5,
+          "effect": "none",
+          "description": "โจมตีแบบหลายเป้าหมาย มีโบนัสเพิ่มความรุนแรง"
+        }
+      ]
+    },
+    "mage": {
+      "name": "นักเวทย์",
+      "base_hp": 100,
+      "base_attack": 15,
+      "base_defense": 5,
+      "skills": [
+        {
+          "id": "m1",
+          "name": "น้ำแข็งร่ายรำ",
+          "target": "single",
+          "hits": 4,
+          "damage_bonus": 1.0,
+          "effect": "freeze",
+          "effect_duration": 4,
+          "description": "โจมตี 4 ครั้ง และแช่แข็งศัตรู 4 เทิร์น"
+        },
+        {
+          "id": "m2",
+          "name": "หยาดน้ำค้าง",
+          "target": "self",
+          "hits": 0,
+          "damage_bonus": 0.0,
+          "effect": "heal",
+          "effect_value": 50,
+          "description": "เพิ่ม HP ของตัวเอง 50 เปอร์เซ็นต์"
+        }
+      ]
+    }
+  }
+}
