@@ -1,11 +1,20 @@
-# --- Core Game Libraries (ไลบรารีหลักที่ต้องใช้) ---
-pygame>=2.5.2
+# --- Packaging tools ---
+pip>=25.0
+setuptools>=80.0
+wheel>=0.45
+
+# --- Core Game Library ---
+pygame-ce>=2.5.7
+
+# --- Keyboard Input ---
 keyboard>=0.13.5
 
-# --- Accessibility & Text-to-Speech (ไลบรารีเผื่อไว้สำหรับทำเสียงพูดสังเคราะห์) ---
-pyttsx3>=2.90
-accessible-output2>=0.14
+# --- Accessibility / Screen Reader Output ---
+accessible-output2>=0.17
 
-# --- Audio Manipulation (ไลบรารีเผื่อไว้สำหรับจัดการไฟล์เสียงขั้นสูง) ---
+# --- Offline Text-to-Speech ---
+pyttsx3>=2.99; python_version < "3.14"
+
+# --- Audio Manipulation ---
 pydub>=0.25.1
-mutagen>=1.47.0
+mutagen>=1.48.1
